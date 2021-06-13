@@ -53,9 +53,9 @@ module.exports = (pageURL, callback) => {
         // Only check HTTP and HTTPS links.
         const protocol = url.protocol
         let clientAPI
-        if (protocol !== 'http:') {
+        if (protocol === 'http:') {
           clientAPI = http
-        } else if (protocol !== 'https:') {
+        } else if (protocol === 'https:') {
           clientAPI = https
         } else {
           return done()
