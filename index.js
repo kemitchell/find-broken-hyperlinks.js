@@ -25,8 +25,10 @@ module.exports = (pageURL, callback) => {
     const toCheck = []
     // Note any base HREF for later.
     let base = pageURL
+    // Note any IDs.
+    const ids = []
     const parser = new ParserStream({
-      onopentag (name, { href }) {
+      onopentag (name, { id, href }) {
         // <base href="">
         if (name === 'base' && href) {
           base = href
@@ -34,6 +36,7 @@ module.exports = (pageURL, callback) => {
         }
         // <a href="">
         if (name === 'a' && href) toCheck.push(href)
+        if (id) ids.push(id)
       }
     })
 
@@ -63,6 +66,19 @@ module.exports = (pageURL, callback) => {
           clientAPI = https
         } else {
           return finish()
+        }
+
+        // Short-circuit links to the same page.
+        if (
+          url.hostname === pageParsed.hostname &&
+          url.pathname === pageParsed.pathname
+        ) {
+          const hash = url.hash
+          if (!hash) return done()
+          if (!ids.includes(hash.slice(1))) {
+            broken.push(url)
+            return finish()
+          }
         }
 
         // Send HEAD request.
