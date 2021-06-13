@@ -1,0 +1,16 @@
+{
+  "name": "find-broken-hyperlinks",
+  "verison": "0.0.0",
+  "description": "find broken hyperlinks on a given webpage",
+  "author": "Kyle E. Mitchell <kyle@kemitchell.com> (https://kemitchell.com/)",
+  "repository": "kemitchell/find-broken-hyperlinks.js",
+  "bin": "bin.js",
+  "files": [
+    "index.js",
+    "bin.js"
+  ],
+  "dependencies": {
+    "htmlparser2": "^6.1.0",
+    "run-parallel-limit": "^1.1.0"
+  }
+}
