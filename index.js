@@ -1,11 +1,18 @@
 const ParserStream = require('htmlparser2/lib/WritableStream').WritableStream
-const { URL } = require('url')
+const http = require('http')
 const https = require('https')
 const runParallelLimit = require('run-parallel-limit')
+const { URL } = require('url')
 
 module.exports = (pageURL, callback) => {
   // Fetch the contents of the page.
-  https.get(pageURL, (response) => {
+  let pageParsed
+  try {
+    pageParsed = new URL(pageURL)
+  } catch (error) {
+    return callback(error)
+  }
+  https.get(pageParsed, (response) => {
     // Check the response status code.
     const statusCode = response.statusCode
     if (statusCode !== 200) {
@@ -36,7 +43,12 @@ module.exports = (pageURL, callback) => {
       const broken = []
       runParallelLimit(toCheck.map(href => done => {
         // Apply any base HREF.
-        const url = new URL(href, base)
+        let url
+        try {
+          url = new URL(href, base)
+        } catch (error) {
+          return done()
+        }
 
         // Only check HTTP and HTTPS links.
         const protocol = url.protocol
