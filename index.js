@@ -93,7 +93,7 @@ function getAndParsePage (url, { hrefs, ids }, callback) {
     if (statusCode !== 200) {
       const error = new Error(`${url} responded ${statusCode}`)
       error.statusCode = statusCode
-      return callback(error)
+      return callback(error, {})
     }
 
     // Find HREFs to check.
