@@ -86,10 +86,29 @@ module.exports = (pageURL, callback) => {
   })
 }
 
-function getAndParsePage (url, { hrefs, ids }, callback) {
+function getAndParsePage (url, { hrefs: returnHREFs, ids: returnIDs }, callback, depth = 0) {
+  if (depth > 3) {
+    const error = new Error(`${url}: too many redirects`)
+    return callback(error, {})
+  }
+
   https.get(url, (response) => {
     // Check the response status code.
     const statusCode = response.statusCode
+    if (statusCode === 301 || statusCode === 302 || statusCode === 303) {
+      const location = response.headers.location
+      if (!location) {
+        const error = new Error(`${url} redirected without Location header`)
+        return callback(error, {})
+      }
+      let parsed
+      try {
+        parsed = new URL(location, url)
+      } catch (error) {
+        return callback(error, {})
+      }
+      return getAndParsePage(parsed, { hrefs: returnHREFs, ids: returnIDs }, callback, depth + 1)
+    }
     if (statusCode !== 200) {
       const error = new Error(`${url} responded ${statusCode}`)
       error.statusCode = statusCode
@@ -110,8 +129,8 @@ function getAndParsePage (url, { hrefs, ids }, callback) {
           return
         }
         // <a href="">
-        if (hrefs && name === 'a' && href) hrefs.push(href)
-        if (ids && id) ids.push(id)
+        if (returnHREFs && name === 'a' && href) hrefs.push(href)
+        if (returnIDs && id) ids.push(id)
       }
     })
 
