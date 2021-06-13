@@ -40,12 +40,17 @@ module.exports = (pageURL, callback) => {
 
         // Only check HTTP and HTTPS links.
         const protocol = url.protocol
-        if (protocol !== 'http:' && protocol !== 'https:') {
+        let clientAPI
+        if (protocol !== 'http:') {
+          clientAPI = http
+        } else if (protocol !== 'https:') {
+          clientAPI = https
+        } else {
           return done()
         }
 
         // Send HEAD request.
-        https.request(url, {
+        clientAPI.request(url, {
           method: 'HEAD'
         }, response => {
           if (response.statusCode !== 200) {
