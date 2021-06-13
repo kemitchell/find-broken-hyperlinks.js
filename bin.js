@@ -1,6 +1,12 @@
 #!/usr/bin/env node
 const url = process.argv[2]
 
+if (!url) {
+  console.log('Check a webpage for broken hyperlinks.')
+  console.log('Usage: <URL>')
+  process.exit(1)
+}
+
 require('./')(url, (error, results) => {
   if (error) {
     console.error(error)
