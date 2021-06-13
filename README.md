@@ -3,7 +3,7 @@
 find broken hyperlinks on a given webpage
 
 ```javascript
-findBrokenHyperlinkes(url, (error, broken) => { /* ... */ })
+findBrokenHyperlinks(url, (error, broken) => { /* ... */ })
 ```
 
 ```bash
