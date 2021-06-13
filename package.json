@@ -13,5 +13,5 @@
     "htmlparser2": "^6.1.0",
     "run-parallel-limit": "^1.1.0"
   },
-  "version": "1.0.0"
+  "version": "1.0.1"
 }
