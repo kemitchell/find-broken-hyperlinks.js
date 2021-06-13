@@ -42,12 +42,16 @@ module.exports = (pageURL, callback) => {
       // Check HREFs.
       const broken = []
       runParallelLimit(toCheck.map(href => done => {
+        function finish (error) {
+          setTimeout(() => done(error), 500)
+        }
+
         // Apply any base HREF.
         let url
         try {
           url = new URL(href, base)
         } catch (error) {
-          return done()
+          return finish()
         }
 
         // Only check HTTP and HTTPS links.
@@ -58,19 +62,25 @@ module.exports = (pageURL, callback) => {
         } else if (protocol === 'https:') {
           clientAPI = https
         } else {
-          return done()
+          return finish()
         }
 
         // Send HEAD request.
         clientAPI.request(url, {
           method: 'HEAD'
         }, response => {
-          if (response.statusCode !== 200) {
+          const statusCode = response.statusCode
+          if (
+            statusCode !== 200 &&
+            (statusCode <= 300 || statusCode > 400) &&
+            statusCode !== 401 &&
+            statusCode !== 403
+          ) {
             broken.push(url)
           }
-          done()
+          finish()
         })
-          .once('error', error => done(error))
+          .once('error', error => finish(error))
           .end()
       }), 3, error => {
         if (error) return callback(error)
